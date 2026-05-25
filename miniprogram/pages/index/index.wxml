@@ -1,0 +1,65 @@
+<view class="container">
+  <!-- Header -->
+  <view class="header">
+    <view class="app-title">上市公司股票分析</view>
+    <view class="app-subtitle">输入公司名称，查询财务数据</view>
+  </view>
+
+  <!-- Search Bar -->
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="请输入上市公司名称"
+      value="{{keyword}}"
+      bindinput="onInput"
+      bindconfirm="onSearch"
+      focus="{{true}}"
+    />
+    <button class="search-btn" bindtap="onSearch" loading="{{searching}}">
+      搜索
+    </button>
+  </view>
+
+  <!-- Loading -->
+  <view class="loading" wx:if="{{searching}}">
+    搜索中...
+  </view>
+
+  <!-- Error -->
+  <view class="error-text" wx:if="{{error}}">
+    {{error}}
+  </view>
+
+  <!-- Search Results -->
+  <view class="results" wx:if="{{results.length > 0 && !searching}}">
+    <view class="result-header">搜索结果 ({{results.length}})</view>
+    <view
+      class="result-item card"
+      wx:for="{{results}}"
+      wx:key="code"
+      bindtap="onSelect"
+      data-code="{{item.code}}"
+      data-name="{{item.name}}"
+    >
+      <view class="stock-name">{{item.name}}</view>
+      <view class="stock-code">
+        {{item.code}}
+        <text class="market-tag">{{item.market === 'SH' ? '沪市' : item.market === 'SZ' ? '深市' : item.market === 'BJ' ? '北交所' : ''}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Empty State -->
+  <view class="empty-state" wx:if="{{results.length === 0 && !searching && hasSearched}}">
+    <view class="empty-text">未找到匹配的公司，请尝试其他关键词</view>
+  </view>
+
+  <!-- Tips -->
+  <view class="tips card" wx:if="{{!hasSearched}}">
+    <view class="card-title">使用说明</view>
+    <view class="tip-item">1. 在搜索框输入上市公司名称</view>
+    <view class="tip-item">2. 点击搜索结果查看详细数据</view>
+    <view class="tip-item">3. 数据涵盖近五年及当年最新财务指标</view>
+    <view class="tip-item">4. 数据来源：东方财富Choice、AKShare</view>
+  </view>
+</view>

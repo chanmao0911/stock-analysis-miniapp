@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+*.log
+nohup.out
+node_modules/

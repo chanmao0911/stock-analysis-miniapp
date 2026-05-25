@@ -1,0 +1,127 @@
+.company-header {
+  text-align: center;
+  padding: 24px 0 20px;
+}
+
+.company-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a73e8;
+  margin-bottom: 6px;
+}
+
+.company-code {
+  font-size: 13px;
+  color: #999;
+}
+
+.profile-text {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.9;
+  text-align: justify;
+}
+
+.structure-item {
+  font-size: 14px;
+  color: #555;
+  line-height: 2.2;
+}
+
+.structure-cat {
+  font-weight: 500;
+  color: #333;
+}
+
+.highlight {
+  color: #1a73e8;
+  font-weight: 600;
+}
+
+/* ====== scroll-view table ====== */
+.scroll-table {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.t-row {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.t-row:last-child {
+  border-bottom: none;
+}
+
+.t-header {
+  background-color: #e8f0fe;
+  border-radius: 4px 4px 0 0;
+}
+
+.t-th {
+  flex-shrink: 0;
+  width: 100px;
+  padding: 14px 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a73e8;
+  text-align: center;
+}
+
+.t-td {
+  flex-shrink: 0;
+  width: 100px;
+  padding: 14px 8px;
+  font-size: 15px;
+  color: #333;
+  text-align: center;
+}
+
+.t-label {
+  width: 90px;
+  font-weight: 500;
+  color: #555;
+  text-align: left;
+  padding-left: 4px;
+}
+
+/* ====== shareholders summary ====== */
+.sh-summary {
+  padding: 12px 4px 4px;
+  font-size: 14px;
+  color: #555;
+  line-height: 2;
+}
+
+/* ====== sources ====== */
+.sources-card {
+  margin-top: 8px;
+}
+
+.source-item {
+  font-size: 13px;
+  color: #777;
+  line-height: 1.8;
+}
+
+.source-note {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #e0e0e0;
+  line-height: 1.6;
+}
+
+/* ====== back button ====== */
+.back-btn {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+}

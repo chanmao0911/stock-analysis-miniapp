@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>上市公司股票分析</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; background:#f5f5f5; color:#333; }
+.header { background: #1a73e8; color: #fff; padding: 24px 16px; text-align: center; }
+.header h1 { font-size: 20px; margin-bottom: 4px; }
+.header p { font-size: 13px; opacity: 0.8; }
+.search-bar { display: flex; padding: 12px; background: #fff; position: sticky; top: 0; z-index: 10; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.search-bar input { flex:1; height: 40px; padding: 0 12px; border: 1px solid #ddd; border-radius: 8px 0 0 8px; font-size: 15px; outline: none; }
+.search-bar button { width: 64px; height: 40px; background: #1a73e8; color: #fff; border: none; border-radius: 0 8px 8px 0; font-size: 15px; cursor: pointer; }
+.container { max-width: 800px; margin: 0 auto; padding: 12px; }
+.card { background: #fff; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card-title { font-size: 16px; font-weight: 600; color: #1a73e8; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; }
+.source-tag { font-size: 11px; color: #999; font-weight: normal; }
+.result-item { padding: 12px; border-bottom: 1px solid #f0f0f0; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.result-item:last-child { border-bottom: none; }
+.result-item:hover { background: #f8f9ff; }
+.stock-name { font-size: 16px; font-weight: 500; }
+.stock-code { font-size: 13px; color: #999; }
+.market-tag { display: inline-block; font-size: 11px; color: #1a73e8; background: #e8f0fe; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+.company-header { text-align: center; padding: 20px 0; background: #fff; margin-bottom: 12px; border-radius: 8px; }
+.company-name { font-size: 22px; font-weight: 700; color: #1a73e8; }
+.company-code { font-size: 13px; color: #999; margin-top: 4px; }
+.profile-text { font-size: 13px; color: #555; line-height: 1.8; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th, .data-table td { border: 1px solid #e0e0e0; padding: 8px 6px; text-align: center; }
+.data-table th { background: #e8f0fe; color: #1a73e8; font-weight: 600; }
+.data-table td { color: #333; }
+.highlight { color: #1a73e8; font-weight: 600; }
+.loading { text-align: center; padding: 40px; color: #999; }
+.error { text-align: center; padding: 40px; color: #e53935; }
+.empty { text-align: center; padding: 60px 20px; color: #aaa; }
+.source-note { font-size: 12px; color: #999; margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e0e0e0; }
+.source-item { font-size: 12px; color: #777; line-height: 1.8; }
+.tips { margin-top: 20px; }
+.tip-item { font-size: 13px; color: #666; line-height: 1.8; }
+.btn-back { display: block; width: 100%; padding: 12px; background: #1a73e8; color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 12px; }
+.links { margin-top: 16px; text-align: center; }
+.links a { color: #1a73e8; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Home Page -->
+  <div id="home">
+    <div class="header">
+      <h1>上市公司股票分析 <small style="font-size:11px;opacity:0.7">v3.0</small></h1>
+      <p>输入公司名称，查询财务数据 · 2026-05-25</p>
+    </div>
+    <div class="search-bar">
+      <input id="searchInput" type="text" placeholder="请输入上市公司名称" onkeydown="if(event.key==='Enter') search()">
+      <button onclick="search()">搜索</button>
+    </div>
+    <div class="container">
+      <div id="searchResults"></div>
+      <div id="tips" class="card tips">
+        <div class="card-title">使用说明</div>
+        <div class="tip-item">1. 在搜索框输入上市公司名称（如：茅台、平安、格力）</div>
+        <div class="tip-item">2. 点击搜索结果查看详细财务数据</div>
+        <div class="tip-item">3. 数据涵盖近五年（2021-2025）及当年最新财务指标</div>
+        <div class="tip-item">4. 数据来源：东方财富Choice、AKShare，万得参考</div>
+        <div class="tip-item" style="margin-top:8px;color:#999;font-size:11px">API: <span id="apiStatus">检测中...</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detail Page (hidden initially) -->
+  <div id="detail" style="display:none"></div>
+</div>
+
+<script>
+// Same-origin: API and frontend served from the same port, no CORS issues
+const API_BASE = '';
+
+// Show API connection status on load
+(async function() {
+  const el = document.getElementById('apiStatus');
+  if (!el) return;
+  try {
+    const r = await fetch(API_BASE + '/api/health');
+    if (r.ok) {
+      const base = API_BASE || window.location.origin;
+    el.innerHTML = '已连接 ' + base + ' ✓';
+      el.style.color = '#4caf50';
+    } else {
+      const base2 = API_BASE || window.location.origin;
+      el.innerHTML = '连接失败 ' + base2;
+      el.style.color = '#e53935';
+    }
+  } catch(e) {
+    const base3 = API_BASE || window.location.origin;
+    el.innerHTML = '无法连接 ' + base3 + ' ✗';
+    el.style.color = '#e53935';
+  }
+})();
+
+async function search() {
+  const keyword = document.getElementById('searchInput').value.trim();
+  if (!keyword) return;
+
+  const tips = document.getElementById('tips');
+  if (tips) tips.style.display = 'none';
+
+  const container = document.getElementById('searchResults');
+  container.innerHTML = '<div class="loading">搜索中...</div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/search?keyword=${encodeURIComponent(keyword)}`);
+    const data = await res.json();
+
+    if (data.code === 0 && data.data && data.data.length > 0) {
+      container.innerHTML = '<div style="padding:8px 0;color:#666;font-size:14px">搜索结果 (' + data.data.length + ')</div>' +
+        data.data.map(s => `
+          <div class="card result-item" onclick="loadCompany('${s.code}','${s.name}')">
+            <span class="stock-name">${s.name}</span>
+            <span class="stock-code">${s.code}<span class="market-tag">${s.market}</span></span>
+          </div>
+        `).join('');
+    } else {
+      container.innerHTML = '<div class="empty">未找到匹配的公司，请尝试其他关键词</div>';
+    }
+  } catch (e) {
+    container.innerHTML = '<div class="error">网络请求失败，请确认后端服务已启动<br><small>（终端运行: cd backend && python3 -m uvicorn main:app --reload）</small></div>';
+  }
+}
+
+async function loadCompany(code, name) {
+  document.getElementById('home').style.display = 'none';
+  const detail = document.getElementById('detail');
+  detail.style.display = 'block';
+  detail.innerHTML = '<div class="loading">加载中...</div>';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/company/${code}`);
+    const json = await res.json();
+
+    if (json.code !== 0 || !json.data) {
+      detail.innerHTML = `<div class="error">${json.message || '未查询到数据'}</div><button class="btn-back" onclick="goHome()">返回搜索</button>`;
+      return;
+    }
+
+    const d = json.data;
+    var years = [2021,2022,2023,2024,2025,'2026(最新)'];
+    var yearKeys = [2021,2022,2023,2024,2025,2026];
+    var sources = d.sources || {};
+
+    function fmt(v) {
+      if (v === null || v === undefined || v === '') return '-';
+      return Number(v).toFixed(2);
+    }
+    function fmtCount(v) {
+      if (v === null || v === undefined) return '-';
+      if (v >= 10000) return (v / 10000).toFixed(2) + '万';
+      return v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    function hasData(obj) {
+      if (!obj) return false;
+      var keys = 0;
+      for (var k in obj) { if (obj.hasOwnProperty(k)) keys++; }
+      return keys > 0;
+    }
+
+    // Build a simple data table using string concatenation (compatible with all browsers)
+    function buildTable(title, dataObj, source) {
+      if (!hasData(dataObj)) return '';
+      var html = '<div class="card"><div class="card-title">' + title;
+      html += '<span class="source-tag">来源：' + source + '</span></div>';
+      html += '<table class="data-table"><tr><th>指标</th>';
+      for (var i = 0; i < years.length; i++) {
+        html += '<th>' + years[i] + '</th>';
+      }
+      html += '</tr><tr><td>' + title + '</td>';
+      for (var j = 0; j < yearKeys.length; j++) {
+        var val = dataObj[yearKeys[j]];
+        html += '<td>' + (val !== undefined && val !== null ? val : '-') + '</td>';
+      }
+      html += '</tr></table></div>';
+      return html;
+    }
+
+    // Revenue structure
+    var revHtml = '';
+    if (d.revenue_structure && d.revenue_structure.length > 0) {
+      revHtml = '<div class="card"><div class="card-title">收入结构概览<span class="source-tag">来源：' + (sources.revenue_structure || '东方财富Choice') + '</span></div>';
+      for (var ri = 0; ri < d.revenue_structure.length; ri++) {
+        var item = d.revenue_structure[ri];
+        revHtml += '<div style="font-size:13px;margin:4px 0"><span style="font-weight:500">' + item.category + '：</span>' + item.value + '</div>';
+      }
+      revHtml += '</div>';
+    }
+
+    // Today's open price
+    var todayHtml = '';
+    if (d.today_open) {
+      todayHtml = '<div class="card"><div class="card-title">当日行情<span class="source-tag">来源：AKShare/新浪</span></div>';
+      todayHtml += '<table class="data-table"><tr><th>日期</th><th>开盘价（元）</th></tr>';
+      todayHtml += '<tr><td>' + (d.today_date || '今日') + '</td><td class="highlight">' + d.today_open + '</td></tr></table></div>';
+    }
+
+    // Asset-liability ratio
+    var alHtml = '';
+    if (hasData(d.asset_liability_ratio)) {
+      alHtml = '<div class="card"><div class="card-title">资产负债率（%）<span class="source-tag">来源：' + (sources.asset_liability || '东方财富Choice') + '</span></div>';
+      alHtml += '<table class="data-table"><tr><th>指标</th>';
+      for (var ai = 0; ai < years.length; ai++) { alHtml += '<th>' + years[ai] + '</th>'; }
+      alHtml += '</tr><tr><td>资产负债率</td>';
+      for (var aj = 0; aj < yearKeys.length; aj++) {
+        var aval = d.asset_liability_ratio[yearKeys[aj]];
+        alHtml += '<td>' + (aval !== undefined && aval !== null ? aval : '-') + '</td>';
+      }
+      alHtml += '</tr></table></div>';
+    }
+
+    // Shareholders
+    var shHtml = '';
+    var sh = d.shareholders || {};
+    if (sh.max_count || sh.current_count) {
+      shHtml = '<div class="card"><div class="card-title">股东人数<span class="source-tag">来源：' + (sources.shareholders || '东方财富Choice') + '</span></div>';
+      shHtml += '<table class="data-table"><tr><th>指标</th>';
+      for (var si = 0; si < years.length; si++) { shHtml += '<th>' + years[si] + '</th>'; }
+      shHtml += '</tr>';
+      if (hasData(sh.by_year)) {
+        shHtml += '<tr><td>年末股东人数</td>';
+        for (var sj = 0; sj < yearKeys.length; sj++) {
+          shHtml += '<td>' + fmtCount(sh.by_year[yearKeys[sj]]) + '</td>';
+        }
+        shHtml += '</tr>';
+      }
+      shHtml += '<tr><td colspan="' + (years.length + 1) + '" style="text-align:left;padding:10px 14px;">';
+      shHtml += '近五年最高：<span class="highlight">' + fmtCount(sh.max_count) + '</span> (' + (sh.max_count_year || '') + '年) &nbsp;';
+      shHtml += '最低：<span class="highlight">' + fmtCount(sh.min_count) + '</span> (' + (sh.min_count_year || '') + '年) &nbsp;';
+      shHtml += '最新：<span class="highlight">' + fmtCount(sh.current_count) + '</span>';
+      shHtml += '</td></tr></table></div>';
+    }
+
+    // Build complete page
+    var html = '';
+    html += '<div class="company-header">';
+    html += '<div class="company-name">' + (d.name || d.full_name) + '</div>';
+    html += '<div class="company-code">' + d.code + ' · ' + (d.market || '') + ' · ' + (d.industry || '') + '</div>';
+    html += '</div><div class="container">';
+
+    if (d.profile) {
+      html += '<div class="card"><div class="card-title">公司简介</div><div class="profile-text">' + d.profile + '</div></div>';
+    }
+    if (d.business_scope) {
+      html += '<div class="card"><div class="card-title">经营范围</div><div class="profile-text">' + d.business_scope + '</div></div>';
+    }
+
+    html += revHtml;
+    html += buildTable('营业收入（亿元）', d.revenue, sources.revenue || '东方财富Choice');
+    html += buildTable('每股收益（元）', d.eps, sources.eps || '东方财富Choice');
+    html += todayHtml;
+    html += buildTable('年度最高股价（元）', d.stock_price_high, sources.stock_price || 'AKShare/新浪');
+    html += buildTable('年度最低股价（元）', d.stock_price_low, sources.stock_price || 'AKShare/新浪');
+    html += shHtml;
+    html += buildTable('每股净资产（元）', d.net_assets_per_share, sources.net_assets || '东方财富Choice');
+    html += alHtml;
+
+    html += '<div class="card"><div class="card-title">数据来源说明</div>';
+    html += '<div class="source-item">东方财富Choice：公司信息、财务数据、股东人数</div>';
+    html += '<div class="source-item">AKShare/新浪：历史股价数据</div>';
+    html += '<div class="source-item">万得(Wind)：参考数据源</div>';
+    html += '<div class="source-note">注：以上数据通过AKShare接口从东方财富等公开数据源获取。</div>';
+    html += '</div>';
+
+    html += '<button class="btn-back" onclick="goHome()">← 返回搜索</button>';
+    html += '</div>';
+
+    detail.innerHTML = html;
+  } catch(e) {
+    detail.innerHTML = `<div class="error">网络请求失败<br><small>${e.message}</small></div><button class="btn-back" onclick="goHome()">返回搜索</button>`;
+  }
+}
+
+function goHome() {
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('detail').style.display = 'none';
+}
+</script>
+</body>
+</html>

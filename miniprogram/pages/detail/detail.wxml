@@ -1,164 +1,176 @@
-<view class="container" wx:if="{{!loading && !error}}">
-
+<scroll-view scroll-y wx:if="{{!loading && !error}}">
   <!-- Company Name -->
   <view class="company-header">
     <view class="company-name">{{name || full_name}}</view>
-    <view class="company-code">{{stockCode}} · {{market}} · {{industry}}</view>
-  </view>
-
-  <!-- Profile -->
-  <view class="card" wx:if="{{profile}}">
-    <view class="card-title">公司简介<text class="source-tag">来源：东方财富Choice</text></view>
-    <view class="profile-text">{{profile}}</view>
-  </view>
-
-  <!-- Business Scope -->
-  <view class="card" wx:if="{{business_scope}}">
-    <view class="card-title">经营范围<text class="source-tag">来源：东方财富Choice</text></view>
-    <view class="profile-text">{{business_scope}}</view>
-  </view>
-
-  <!-- Revenue Structure -->
-  <view class="card" wx:if="{{revenue_structure.length > 0}}">
-    <view class="card-title">营业收入结构<text class="source-tag">来源：东方财富Choice</text></view>
-    <view class="structure-item" wx:for="{{revenue_structure}}" wx:key="category">
-      <text class="structure-cat">{{item.category}}：</text>{{item.value}}
+    <view class="company-code">
+      <text>{{stockCode}}</text>
+      <text wx:if="{{market}}">{{market}}</text>
+      <text wx:if="{{industry}}">{{industry}}</text>
     </view>
   </view>
 
-  <!-- Today -->
-  <view class="card" wx:if="{{today_open}}">
-    <view class="card-title">当日行情<text class="source-tag">来源：AKShare/新浪</text></view>
-    <view class="table-wrap">
-      <view class="t-row"><view class="t-th">日期</view><view class="t-th">开盘价（元）</view></view>
-      <view class="t-row"><view class="t-td">{{today_date || '今日'}}</view><view class="t-td highlight">{{today_open}}</view></view>
+  <view class="container">
+    <!-- Today's Price Hero -->
+    <view class="today-card" wx:if="{{today_open}}">
+      <view class="today-label">当日开盘价（元）</view>
+      <view class="today-price">{{today_open}}</view>
+      <view class="today-date">{{today_date || '最新交易日'}}</view>
     </view>
-  </view>
 
-  <!-- Revenue Table -->
-  <view class="card" wx:if="{{revenue_rows.length > 0}}">
-    <view class="card-title">营业收入（亿元）<text class="source-tag">来源：东方财富Choice</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="t-row">
-        <view class="t-td t-label">营业收入</view>
-        <view class="t-td" wx:for="{{revenue_rows}}" wx:key="index">{{item}}</view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- EPS Table -->
-  <view class="card" wx:if="{{eps_rows.length > 0}}">
-    <view class="card-title">每股收益（元）<text class="source-tag">来源：东方财富Choice</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="t-row">
-        <view class="t-td t-label">每股收益</view>
-        <view class="t-td" wx:for="{{eps_rows}}" wx:key="index">{{item}}</view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- High Price Table -->
-  <view class="card" wx:if="{{high_rows.length > 0}}">
-    <view class="card-title">年度最高股价（元）<text class="source-tag">来源：AKShare/新浪</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="t-row">
-        <view class="t-td t-label">最高股价</view>
-        <view class="t-td" wx:for="{{high_rows}}" wx:key="index">{{item}}</view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- Low Price Table -->
-  <view class="card" wx:if="{{low_rows.length > 0}}">
-    <view class="card-title">年度最低股价（元）<text class="source-tag">来源：AKShare/新浪</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="t-row">
-        <view class="t-td t-label">最低股价</view>
-        <view class="t-td" wx:for="{{low_rows}}" wx:key="index">{{item}}</view>
-      </view>
-    </scroll-view>
-  </view>
-
-  <!-- Shareholders Table -->
-  <view class="card" wx:if="{{sh_rows.length > 0}}">
-    <view class="card-title">股东人数<text class="source-tag">来源：东方财富Choice</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="t-row">
-        <view class="t-td t-label">年末股东人数</view>
-        <view class="t-td" wx:for="{{sh_rows}}" wx:key="index">{{item}}</view>
-      </view>
-    </scroll-view>
-    <view class="sh-summary">
-      近五年最高：<text class="highlight">{{sh_max}}</text>
-      &nbsp;&nbsp;最低：<text class="highlight">{{sh_min}}</text>
-      &nbsp;&nbsp;最新：<text class="highlight">{{sh_current}}</text>
+    <!-- Profile -->
+    <view class="card" wx:if="{{profile}}">
+      <view class="card-title">公司简介<text class="source-tag">东方财富Choice</text></view>
+      <view class="profile-text">{{profile}}</view>
     </view>
-  </view>
 
-  <!-- Net Assets Table -->
-  <view class="card" wx:if="{{nav_rows.length > 0}}">
-    <view class="card-title">每股净资产（元）<text class="source-tag">来源：东方财富Choice</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
-      </view>
-      <view class="t-row">
-        <view class="t-td t-label">每股净资产</view>
-        <view class="t-td" wx:for="{{nav_rows}}" wx:key="index">{{item}}</view>
-      </view>
-    </scroll-view>
-  </view>
+    <!-- Business Scope -->
+    <view class="card" wx:if="{{business_scope}}">
+      <view class="card-title">经营范围<text class="source-tag">东方财富Choice</text></view>
+      <view class="profile-text">{{business_scope}}</view>
+    </view>
 
-  <!-- Asset-Liability Table -->
-  <view class="card" wx:if="{{alr_rows.length > 0}}">
-    <view class="card-title">资产负债率（%）<text class="source-tag">来源：东方财富Choice</text></view>
-    <scroll-view scroll-x class="scroll-table">
-      <view class="t-row t-header">
-        <view class="t-th t-label">指标</view>
-        <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+    <!-- Revenue Structure -->
+    <view class="card" wx:if="{{revenue_structure.length > 0}}">
+      <view class="card-title">收入结构<text class="source-tag">东方财富Choice</text></view>
+      <view class="structure-item" wx:for="{{revenue_structure}}" wx:key="category">
+        <text class="structure-cat">{{item.category}}</text>
+        <text>{{item.value}}</text>
       </view>
-      <view class="t-row">
-        <view class="t-td t-label">资产负债率</view>
-        <view class="t-td" wx:for="{{alr_rows}}" wx:key="index">{{item}}</view>
+    </view>
+
+    <!-- Revenue -->
+    <view class="card" wx:if="{{revenue_rows.length > 0}}">
+      <view class="card-title">营业收入<text class="source-tag">东方财富Choice</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">营业收入</view>
+          <view class="t-td" wx:for="{{revenue_rows}}" wx:key="index">{{item}}<text style="font-size:11px;color:#94a3b8"> 亿</text></view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- EPS -->
+    <view class="card" wx:if="{{eps_rows.length > 0}}">
+      <view class="card-title">每股收益<text class="source-tag">东方财富Choice</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">每股收益</view>
+          <view class="t-td" wx:for="{{eps_rows}}" wx:key="index">{{item}}<text style="font-size:11px;color:#94a3b8"> 元</text></view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- High Price -->
+    <view class="card" wx:if="{{high_rows.length > 0}}">
+      <view class="card-title">年度最高股价<text class="source-tag">AKShare/新浪</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">最高股价</view>
+          <view class="t-td" wx:for="{{high_rows}}" wx:key="index">{{item}}<text style="font-size:11px;color:#94a3b8"> 元</text></view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- Low Price -->
+    <view class="card" wx:if="{{low_rows.length > 0}}">
+      <view class="card-title">年度最低股价<text class="source-tag">AKShare/新浪</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">最低股价</view>
+          <view class="t-td" wx:for="{{low_rows}}" wx:key="index">{{item}}<text style="font-size:11px;color:#94a3b8"> 元</text></view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- Shareholders -->
+    <view class="card" wx:if="{{sh_rows.length > 0}}">
+      <view class="card-title">股东人数<text class="source-tag">东方财富Choice</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">年末股东人数</view>
+          <view class="t-td" wx:for="{{sh_rows}}" wx:key="index">{{item}}</view>
+        </view>
+      </scroll-view>
+      <view class="sh-summary">
+        <text>最高 <text class="highlight">{{sh_max}}</text></text>
+        <text>最低 <text class="highlight">{{sh_min}}</text></text>
+        <text>最新 <text class="highlight">{{sh_current}}</text></text>
       </view>
-    </scroll-view>
-  </view>
+    </view>
 
-  <!-- Sources -->
-  <view class="card">
-    <view class="card-title">数据来源说明</view>
-    <view class="source-item">东方财富Choice：公司信息、财务数据、股东人数</view>
-    <view class="source-item">AKShare/新浪：历史股价数据</view>
-    <view class="source-item">万得(Wind)：参考数据源</view>
-    <view class="source-note">注：以上数据通过AKShare接口从东方财富等公开数据源获取。</view>
-  </view>
+    <!-- Net Assets -->
+    <view class="card" wx:if="{{nav_rows.length > 0}}">
+      <view class="card-title">每股净资产<text class="source-tag">东方财富Choice</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">每股净资产</view>
+          <view class="t-td" wx:for="{{nav_rows}}" wx:key="index">{{item}}<text style="font-size:11px;color:#94a3b8"> 元</text></view>
+        </view>
+      </scroll-view>
+    </view>
 
+    <!-- ALR -->
+    <view class="card" wx:if="{{alr_rows.length > 0}}">
+      <view class="card-title">资产负债率<text class="source-tag">东方财富Choice</text></view>
+      <scroll-view scroll-x class="scroll-table">
+        <view class="t-row t-header">
+          <view class="t-th t-label">指标</view>
+          <view class="t-th" wx:for="{{years}}" wx:key="index">{{item}}</view>
+        </view>
+        <view class="t-row">
+          <view class="t-td t-label">资产负债率</view>
+          <view class="t-td" wx:for="{{alr_rows}}" wx:key="index">{{item}}<text style="font-size:11px;color:#94a3b8" wx:if="{{item!=='-'}}">%</text></view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- Sources -->
+    <view class="card sources-card">
+      <view class="card-title">数据来源说明</view>
+      <view class="source-item">📊 东方财富Choice：公司信息、财务数据、股东人数</view>
+      <view class="source-item">📈 AKShare/新浪：历史股价数据</view>
+      <view class="source-item">📚 万得(Wind)：参考数据源（交叉验证）</view>
+      <view class="source-note">以上数据通过AKShare接口从东方财富等公开数据源获取，万得作为专业金融终端提供交叉验证参考。数据仅供参考，不构成投资建议。</view>
+    </view>
+
+    <!-- Back -->
+    <view class="back-btn" bindtap="goBack">← 返回搜索</view>
+
+  </view>
+</scroll-view>
+
+<!-- Loading -->
+<view class="loading" wx:if="{{loading}}">
+  <view class="loading-spinner"></view>
+  <text>加载财务数据中...</text>
 </view>
 
-<view class="loading" wx:if="{{loading}}">加载中...</view>
-
+<!-- Error -->
 <view class="container" wx:if="{{error}}">
   <view class="error-text">{{error}}</view>
-  <button class="back-btn" bindtap="goBack">返回搜索</button>
+  <view class="back-btn" bindtap="goBack">返回搜索</view>
 </view>

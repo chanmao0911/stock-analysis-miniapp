@@ -1,50 +1,181 @@
+/* ============================================
+   查财报 - 上市公司股票分析
+   全局样式 · 专业金融风
+   ============================================ */
+
 page {
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC",
-    "Microsoft YaHei", sans-serif;
+  --blue: #1a6ff5;
+  --blue-dark: #0d4fbf;
+  --blue-light: #e8f1fe;
+  --green: #10b981;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-500: #64748b;
+  --gray-700: #334155;
+  --gray-900: #0f172a;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.10);
+
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   font-size: 15px;
-  color: #333;
-  background-color: #f5f5f5;
+  color: var(--gray-900);
+  background: #f0f4f8;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
-  padding: 10px;
+  padding: 14px 14px 30px;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
+/* ====== Card ====== */
 .card {
   background: #fff;
-  border-radius: 8px;
-  padding: 14px 12px;
+  border-radius: var(--radius);
+  padding: 18px 16px;
   margin-bottom: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-100);
+  transition: transform 0.15s;
 }
 
 .card-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: #1a73e8;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--gray-900);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--gray-100);
+  position: relative;
+}
+
+.card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background: var(--blue);
+  border-radius: 1px;
 }
 
 .source-tag {
-  display: inline-block;
-  font-size: 12px;
-  color: #999;
+  font-size: 11px;
+  color: var(--gray-500);
+  font-weight: 400;
+  background: var(--gray-50);
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
   margin-left: 8px;
-  font-weight: normal;
 }
 
-.loading {
-  text-align: center;
-  padding: 60px 0;
-  color: #999;
+/* ====== Scroll Table ====== */
+.scroll-table {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.t-row {
+  display: flex;
+  flex-direction: row;
+  min-height: 48px;
+  align-items: center;
+}
+
+.t-header {
+  background: linear-gradient(135deg, #f0f5ff, #e8f1fe);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.t-header .t-th {
+  font-weight: 700;
+  color: var(--blue);
+}
+
+.t-th {
+  flex-shrink: 0;
+  width: 96px;
+  padding: 14px 10px;
   font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  border-right: 1px solid rgba(0,0,0,0.04);
+}
+
+.t-td {
+  flex-shrink: 0;
+  width: 96px;
+  padding: 14px 10px;
+  font-size: 15px;
+  color: var(--gray-700);
+  text-align: center;
+  border-right: 1px solid var(--gray-100);
+  font-variant-numeric: tabular-nums;
+}
+
+.t-label {
+  width: 86px;
+  font-weight: 600;
+  color: var(--gray-700);
+  text-align: left;
+  padding-left: 6px;
+  border-right: 1px solid var(--gray-200);
+}
+
+.t-row:not(.t-header) {
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.t-row:nth-child(odd):not(.t-header) {
+  background: var(--gray-50);
+}
+
+/* ====== Highlight ====== */
+.highlight {
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+/* ====== Loading & Error ====== */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 0;
+  color: var(--gray-500);
+  font-size: 14px;
+}
+
+.loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 14px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .error-text {
-  color: #e53935;
+  color: var(--red);
   text-align: center;
   padding: 40px 0;
   font-size: 15px;

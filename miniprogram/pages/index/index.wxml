@@ -1,65 +1,101 @@
-<view class="container">
+<view class="page-index">
   <!-- Header -->
-  <view class="header">
-    <view class="app-title">上市公司股票分析</view>
-    <view class="app-subtitle">输入公司名称，查询财务数据</view>
+  <view class="hero">
+    <view class="hero-icon">📊</view>
+    <view class="hero-title">查财报</view>
+    <view class="hero-desc">上市公司财务数据，一搜即得</view>
   </view>
 
   <!-- Search Bar -->
-  <view class="search-bar">
-    <input
-      class="search-input"
-      placeholder="请输入上市公司名称"
-      value="{{keyword}}"
-      bindinput="onInput"
-      bindconfirm="onSearch"
-      focus="{{true}}"
-    />
-    <button class="search-btn" bindtap="onSearch" loading="{{searching}}">
-      搜索
-    </button>
+  <view class="search-section">
+    <view class="search-box">
+      <view class="search-icon">🔍</view>
+      <input
+        class="search-input"
+        placeholder="输入上市公司名称，如：茅台、平安银行"
+        value="{{keyword}}"
+        bindinput="onInput"
+        bindconfirm="onSearch"
+        focus="{{true}}"
+        confirm-type="search"
+      />
+      <button class="search-btn" bindtap="onSearch" loading="{{searching}}">
+        查询
+      </button>
+    </view>
   </view>
 
   <!-- Loading -->
   <view class="loading" wx:if="{{searching}}">
-    搜索中...
+    <view class="loading-spinner"></view>
+    <text>正在搜索...</text>
   </view>
 
-  <!-- Error -->
-  <view class="error-text" wx:if="{{error}}">
-    {{error}}
-  </view>
-
-  <!-- Search Results -->
-  <view class="results" wx:if="{{results.length > 0 && !searching}}">
-    <view class="result-header">搜索结果 ({{results.length}})</view>
+  <!-- Results -->
+  <view class="results-wrap" wx:if="{{results.length > 0 && !searching}}">
+    <view class="results-count">找到 <text class="count-num">{{results.length}}</text> 家公司</view>
     <view
-      class="result-item card"
+      class="result-card"
       wx:for="{{results}}"
       wx:key="code"
       bindtap="onSelect"
       data-code="{{item.code}}"
       data-name="{{item.name}}"
     >
-      <view class="stock-name">{{item.name}}</view>
-      <view class="stock-code">
-        {{item.code}}
-        <text class="market-tag">{{item.market === 'SH' ? '沪市' : item.market === 'SZ' ? '深市' : item.market === 'BJ' ? '北交所' : ''}}</text>
+      <view class="rc-left">
+        <view class="rc-avatar">{{item.name[0]}}</view>
+      </view>
+      <view class="rc-center">
+        <view class="rc-name">{{item.name}}</view>
+        <view class="rc-code">{{item.code}}</view>
+      </view>
+      <view class="rc-right">
+        <view class="rc-market">{{item.market || 'A股'}}</view>
+        <view class="rc-arrow">›</view>
       </view>
     </view>
   </view>
 
-  <!-- Empty State -->
+  <!-- Empty -->
   <view class="empty-state" wx:if="{{results.length === 0 && !searching && hasSearched}}">
-    <view class="empty-text">未找到匹配的公司，请尝试其他关键词</view>
+    <view class="empty-icon">📭</view>
+    <view class="empty-title">未找到匹配的公司</view>
+    <view class="empty-tip">请尝试其他关键词，如"格力"、"宁德"</view>
   </view>
 
-  <!-- Tips -->
-  <view class="tips card" wx:if="{{!hasSearched}}">
-    <view class="card-title">使用说明</view>
-    <view class="tip-item">1. 在搜索框输入上市公司名称</view>
-    <view class="tip-item">2. 点击搜索结果查看详细数据</view>
-    <view class="tip-item">3. 数据涵盖近五年及当年最新财务指标</view>
-    <view class="tip-item">4. 数据来源：东方财富Choice、AKShare</view>
+  <!-- Welcome -->
+  <view class="welcome" wx:if="{{!hasSearched}}">
+    <view class="welcome-title">热门搜索</view>
+    <view class="hot-tags">
+      <view class="hot-tag" bindtap="onQuickSearch" data-kw="茅台">茅台</view>
+      <view class="hot-tag" bindtap="onQuickSearch" data-kw="平安银行">平安银行</view>
+      <view class="hot-tag" bindtap="onQuickSearch" data-kw="格力电器">格力电器</view>
+      <view class="hot-tag" bindtap="onQuickSearch" data-kw="比亚迪">比亚迪</view>
+      <view class="hot-tag" bindtap="onQuickSearch" data-kw="宁德时代">宁德时代</view>
+      <view class="hot-tag" bindtap="onQuickSearch" data-kw="美的集团">美的集团</view>
+    </view>
+
+    <view class="feature-list">
+      <view class="feature-item">
+        <view class="fi-icon">📈</view>
+        <view class="fi-text">近五年营业收入 & 每股收益</view>
+      </view>
+      <view class="feature-item">
+        <view class="fi-icon">📉</view>
+        <view class="fi-text">年度最高/最低股价走势</view>
+      </view>
+      <view class="feature-item">
+        <view class="fi-icon">👥</view>
+        <view class="fi-text">股东人数 & 资产负债率</view>
+      </view>
+      <view class="feature-item">
+        <view class="fi-icon">📋</view>
+        <view class="fi-text">公司简介 & 经营范围</view>
+      </view>
+    </view>
+
+    <view class="source-note">
+      数据来源：东方财富Choice · AKShare · 万得参考
+    </view>
   </view>
 </view>

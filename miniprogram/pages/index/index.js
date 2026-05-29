@@ -19,7 +19,16 @@ Page({
       this.setData({ error: "请输入公司名称" });
       return;
     }
+    this._doSearch(keyword);
+  },
 
+  onQuickSearch(e) {
+    const kw = e.currentTarget.dataset.kw;
+    this.setData({ keyword: kw });
+    this._doSearch(kw);
+  },
+
+  _doSearch(keyword) {
     this.setData({ searching: true, error: "", results: [] });
 
     searchCompanies(keyword)

@@ -4,10 +4,10 @@
     "pages/detail/detail"
   ],
   "window": {
-    "navigationBarBackgroundColor": "#1a73e8",
-    "navigationBarTitleText": "上市公司股票分析",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f5f5f5"
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "查财报",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f0f4f8"
   },
   "style": "v2",
   "sitemapLocation": "sitemap.json"

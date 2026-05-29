@@ -1,0 +1,12 @@
+{
+  "name": "stock-api",
+  "description": "查财报小程序后端API",
+  "containerPort": 8000,
+  "envParams": {},
+  "cpu": 0.5,
+  "mem": 1,
+  "minNum": 1,
+  "maxNum": 3,
+  "policyType": "cpu",
+  "policyThreshold": 60
+}

@@ -5,8 +5,11 @@ const app = getApp();
  */
 function request(path, params = {}) {
   return new Promise((resolve, reject) => {
-    // In dev mode, use localhost. For phone testing, change to LAN IP.
-    const baseUrl = app.globalData.apiBase || 'http://192.168.31.79:8000';
+    const baseUrl = app.globalData.apiBase;
+    if (!baseUrl) {
+      reject(new Error("未配置后端服务地址，请在 app.js 中设置 apiBase"));
+      return;
+    }
     const query = Object.keys(params)
       .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
       .join("&");

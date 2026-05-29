@@ -1,10 +1,11 @@
 App({
   onLaunch() {
-    console.log("上市公司股票分析 小程序启动");
+    console.log("查财报 小程序启动");
   },
   globalData: {
-    // Base URL of the backend API
-    // Change this to your actual server address in production
-    apiBase: "http://192.168.31.79:8000",
+    // 云托管部署后，填入云托管服务的外网访问地址
+    // 格式如: https://xxx.ap-shanghai.run.tcloudbase.com
+    // 开发调试时可改为本地地址: http://localhost:8000
+    apiBase: "",
   },
 });

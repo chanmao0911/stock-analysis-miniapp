@@ -1,11 +1,8 @@
 App({
   onLaunch() {
-    console.log("查财报 小程序启动");
+    console.log("业绩快查 小程序启动");
   },
   globalData: {
-    // 云托管部署后，填入云托管服务的外网访问地址
-    // 格式如: https://xxx.ap-shanghai.run.tcloudbase.com
-    // 开发调试时可改为本地地址: http://localhost:8000
-    apiBase: "",
+    apiBase: "https://stock-api-263820-8-1438180415.sh.run.tcloudbase.com",
   },
 });

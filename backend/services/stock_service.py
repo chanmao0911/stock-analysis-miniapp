@@ -125,7 +125,7 @@ def search_stocks(keyword: str) -> list[dict]:
 
 
 def get_company_info(stock_code: str) -> dict:
-    """Get company basic info from 东方财富."""
+    """Get company basic info from 巨潮资讯 (cninfo)."""
     cache_key = f"info_{stock_code}"
     cached = _cached(cache_key)
     if cached is not None:
@@ -133,21 +133,39 @@ def get_company_info(stock_code: str) -> dict:
 
     info = {}
 
-    # Primary: xueqiu basic info (includes intro, business scope, industry)
+    # Primary: cninfo profile (reliable, rich profile data)
     try:
-        df = ak.stock_individual_basic_info_xq(
-            symbol=_market_prefix(stock_code), timeout=10
-        )
+        df = ak.stock_profile_cninfo(symbol=stock_code)
         if df is not None and not df.empty:
-            for _, row in df.iterrows():
-                item = str(row.get("item", "")).strip()
-                value = str(row.get("value", "")).strip()
-                if item and value and value.lower() != "nan":
-                    info[item] = value
-    except Exception:
-        pass
+            row = df.iloc[0]
+            for col in df.columns:
+                val = row[col]
+                if val is not None and not (isinstance(val, float) and pd.isna(val)):
+                    val_str = str(val).strip()
+                    if val_str and val_str.lower() != "nan" and val_str.lower() != "none":
+                        info[col] = val_str
+            logger.info(f"cninfo returned {len(info)} fields for {stock_code}: {list(info.keys())[:5]}...")
+        else:
+            logger.warning(f"cninfo returned empty dataframe for {stock_code}")
+    except Exception as e:
+        logger.warning(f"cninfo profile failed for {stock_code}: {e}")
 
-    # Fallback: eastmoney individual info
+    # Fallback 1: xueqiu individual info
+    if not info:
+        try:
+            df = ak.stock_individual_basic_info_xq(
+                symbol=_market_prefix(stock_code), timeout=10
+            )
+            if df is not None and not df.empty:
+                for _, row in df.iterrows():
+                    item = str(row.get("item", "")).strip()
+                    value = str(row.get("value", "")).strip()
+                    if item and value and value.lower() != "nan":
+                        info[item] = value
+        except Exception:
+            pass
+
+    # Fallback 2: eastmoney individual info
     if not info:
         try:
             df = ak.stock_individual_info_em(symbol=stock_code, timeout=10)
@@ -168,10 +186,10 @@ def get_all_company_data(stock_code: str) -> dict:
     """Fetch and return all financial data for a company (parallel)."""
     company_info = get_company_info(stock_code)
 
-    # Name: try company_info first, then search, then yjbb data
-    name = (company_info.get("股票简称")
-            or company_info.get("org_short_name_cn", "")
-            or company_info.get("A股简称", ""))
+    # Name: try cninfo first, then old APIs, then search
+    name = (company_info.get("A股简称")
+            or company_info.get("股票简称")
+            or company_info.get("org_short_name_cn", ""))
     if not name:
         name = _find_company_name(stock_code)
 
@@ -179,16 +197,18 @@ def get_all_company_data(stock_code: str) -> dict:
                 or company_info.get("org_name_cn", "")
                 or name)
 
-    profile = (company_info.get("org_cn_introduction", "")
+    profile = (company_info.get("机构简介", "")
+              or company_info.get("org_cn_introduction", "")
               or company_info.get("公司简介", "")
               or company_info.get("main_operation_business", ""))
 
-    business_scope = (company_info.get("operating_scope", "")
-                     or company_info.get("经营范围", "")
+    business_scope = (company_info.get("经营范围", "")
+                     or company_info.get("operating_scope", "")
+                     or company_info.get("主营业务", "")
                      or company_info.get("main_operation_business", ""))
 
-    # Industry: try xueqiu, then profile, then company_info
-    industry = company_info.get("行业", company_info.get("所属行业", ""))
+    # Industry: try cninfo first, then xueqiu, then profile
+    industry = company_info.get("所属行业", company_info.get("行业", ""))
     if not industry:
         ai = company_info.get("affiliate_industry", "")
         if ai and isinstance(ai, str):

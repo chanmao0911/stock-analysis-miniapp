@@ -1,5 +1,5 @@
 """
-上市公司股票分析 - 后端 + 前端一体化服务
+业绩快查 - 后端 + 前端一体化服务
 """
 import logging
 from pathlib import Path
@@ -14,7 +14,7 @@ from services.stock_service import search_stocks, get_all_company_data
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="上市公司股票分析", version="3.0")
+app = FastAPI(title="业绩快查", version="3.0")
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,6 +1,6 @@
 {
   "name": "stock-api",
-  "description": "查财报小程序后端API",
+  "description": "业绩快查小程序后端API",
   "containerPort": 8000,
   "envParams": {},
   "cpu": 0.5,
@@ -8,5 +8,6 @@
   "minNum": 1,
   "maxNum": 3,
   "policyType": "cpu",
-  "policyThreshold": 60
+  "policyThreshold": 60,
+  "openAccessTypes": ["PUBLIC", "MINIAPP"]
 }

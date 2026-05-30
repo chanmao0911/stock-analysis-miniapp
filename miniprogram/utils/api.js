@@ -1,8 +1,5 @@
 const app = getApp();
 
-/**
- * Send request to the backend API.
- */
 function request(path, params = {}) {
   return new Promise((resolve, reject) => {
     const baseUrl = app.globalData.apiBase;
@@ -33,16 +30,10 @@ function request(path, params = {}) {
   });
 }
 
-/**
- * Search for companies by name keyword.
- */
 function searchCompanies(keyword) {
   return request("/api/search", { keyword });
 }
 
-/**
- * Get all financial data for a company.
- */
 function getCompanyData(stockCode) {
   return request(`/api/company/${stockCode}`);
 }

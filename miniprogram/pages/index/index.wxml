@@ -2,7 +2,7 @@
   <!-- Header -->
   <view class="hero">
     <view class="hero-icon">📊</view>
-    <view class="hero-title">查财报</view>
+    <view class="hero-title">业绩快查</view>
     <view class="hero-desc">上市公司财务数据，一搜即得</view>
   </view>
 
